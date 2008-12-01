@@ -1,6 +1,9 @@
 Flickr Tickler
 ==============
 
+
+Check it out live: [flickrtickler.appspot.com](http://flickrtickler.appspot.com "Flickr Tickler")
+
 A google app engine project to make browsing some parts of flickr easier.
 
 Very much not-done.
