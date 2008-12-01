@@ -16,6 +16,7 @@ a {
 
 .photo img {
   padding-top: 1em;
+  border: none;
 }
 
 .photo a:focus {
