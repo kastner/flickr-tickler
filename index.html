@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>Welcome to the Flickr Tickler</h1>
+
+<p>
+  The Flickr Tickler is a unique way to view flickr pictures quickly and smoothly.
+</p>
+
+<p>
+  Using your keyboard (j to go down, k to go up - even across pages!), you can look at any group / set of flickr pictures you want. Group pools, personal photostreams, even tags!
+</p>
+
+<p>
+  To get started, put any flickr url in this box and we'll take it from there. If you want to do a tag search, type one or more in the box instead. (Currently only users and groups are working)
+</p>
+
+<form action="/tickle" method="get">
+  <div>
+    <label for="url">URL:</label>
+    <input type="text" name="url" id="url"/>
+  </div>
+  
+  <div>
+    <input type="submit" value="Start"/>
+  </div>
+</form>
+
+{% endblock %}

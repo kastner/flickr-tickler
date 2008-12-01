@@ -1,0 +1,23 @@
+body {
+  font: medium Helvetica, Arial, Verdana, sans-serif;
+  background: black;
+  color: white;
+}
+
+a {
+  color: #D4C174;
+}
+
+.photo {
+  padding-top: 2em;
+  margin: 2em;
+  margin-bottom: 15em;
+}
+
+.photo img {
+  padding-top: 1em;
+}
+
+.photo a:focus {
+  outline: 1px solid #525252;
+}

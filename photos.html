@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+<div id="bob"></div>
+{% for photo in photos %}
+<div id="photo-{{ forloop.counter }}" class="photo photo-{{ photo.id }}">
+  <a href="http://www.flickr.com/photos/{{ photo.owner }}/{{ photo.id }}" target="_blank">{{ photo.title }}</a><br/>
+  <a href="http://www.flickr.com/photos/{{ photo.owner }}/{{ photo.id }}" title="{{ photo.title }}">
+    <img src="http://farm{{ photo.farm }}.static.flickr.com/{{ photo.server }}/{{ photo.id }}_{{ photo.secret }}.jpg" alt="{{ photo.title }}"/>
+  </a>
+</div>
+{% endfor %}
+<a id="prev-link" href="?page={{ prev_page }}">Prev</a>
+<a id="next-link" href="?page={{ next_page }}">Next</a>
+
+
+<script type="text/javascript" charset="utf-8">
+  var current_pic = 0;
+  Event.observe(window, 'keyup', function() {
+    var go = 0;
+    switch(event.keyCode) {
+      case 74: // "J"
+        go = 1; break;
+      case 75: // "K"
+        go = -1; break;
+    }
+    if (go != 0) {
+      current_pic += go;
+      if ($("photo-" + current_pic)) {
+        $("photo-" + current_pic).scrollTo();
+        $("photo-" + current_pic).down("a").focus();
+      }
+      else {
+        if (current_pic < 0) {
+          window.location = $("prev-link").getAttribute("href");
+        }
+        else {
+          window.location = $("next-link").getAttribute("href");
+        }
+      }
+      
+    }
+  });
+</script>
+{% endblock %}
