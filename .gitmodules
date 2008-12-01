@@ -1,0 +1,3 @@
+[submodule "myflickr"]
+	path = myflickr
+	url = git://github.com/kastner/myflickr.git
