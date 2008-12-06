@@ -63,7 +63,12 @@ class PhotoHandler(RequestHandler):
         return (item, page)
         
     def photo_render(self, **kwargs):
-        self.render("photos.html", **kwargs)
+        photos_block = template.render("photos.html", kwargs)
+        if (str(self.request.accept).startswith("text/javascript")):
+            self.response.out.write(photos_block)
+        else:
+            kwargs.update({"photos_block": photos_block})
+            self.render("photo_page.html", **kwargs)
         
         
 class GroupHandler(PhotoHandler):
