@@ -10,5 +10,8 @@ handlers:
 - url: /javascripts
   static_dir: javascripts
   
+- url: /javascripts
+  static_dir: javascripts
+  
 - url: .*
   script: main.py

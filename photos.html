@@ -1,3 +1,6 @@
+<script type="text/javascript" charset="utf-8">
+  maxPhotoNum = {{ photos|length }}
+</script>
 {% for photo in photos %}
 <div id="photo-{{ forloop.counter|add:offset }}" class="photo photo-{{ photo.id }}">
   <a href="http://www.flickr.com/photos/{{ photo.owner }}/{{ photo.id }}" target="_blank">{{ photo.title }}</a><br/>
