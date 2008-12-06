@@ -14,30 +14,46 @@
 
 
 <script type="text/javascript" charset="utf-8">
-  var current_pic = 0;
+  var currentPhotoNum = 1;
+  var maxPhotoNum = {{ photos|length }};
+  
+  function getPhoto(num) {
+    return $("photo-" + num);
+  }
+  
+  function currentPhoto() {
+    return getPhoto(currentPhotoNum);
+  }
+  
+  function nextDivNum() {
+    for(i = 1; i <= maxPhotoNum; i++) {
+      if (getPhoto(i).viewportOffset().top > 0) { break; }
+    }
+    
+    return i;
+  }
+  
+  function prevDivNum() {
+    nextNum = nextDivNum();
+    return (nextNum > 2) ? nextNum - 2 : 1;
+  }
+  
+  function nextElement() {
+    currentPhotoNum = nextDivNum();
+    return currentPhoto();
+  }
+  
+  function prevElement() {
+    currentPhotoNum = prevDivNum();
+    return currentPhoto();
+  }
+  
   Event.observe(window, 'keyup', function(event) {
-    var go = 0;
     switch(event.keyCode) {
       case 74: // "J"
-        go = 1; break;
+        nextElement().scrollTo(); break;
       case 75: // "K"
-        go = -1; break;
-    }
-    if (go != 0) {
-      current_pic += go;
-      if ($("photo-" + current_pic)) {
-        $("photo-" + current_pic).scrollTo();
-        $("photo-" + current_pic).down("a").focus();
-      }
-      else {
-        if (current_pic < 0) {
-          window.location = $("prev-link").getAttribute("href");
-        }
-        else {
-          window.location = $("next-link").getAttribute("href");
-        }
-      }
-      
+        prevElement().scrollTo(); break;
     }
   });
 </script>
