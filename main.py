@@ -49,8 +49,11 @@ class TickleHandler(RequestHandler):
         
 
 class PhotoHandler(RequestHandler):
+    per_page = 15
+    
     def __init__(self):
         self.flickr = MyFlickr("bf1a023e68d6ce32412b9988a3c5cdcb")
+        
     def parse(self):
         page = 1
         item = self.request.url.split("/")[-1]
@@ -58,6 +61,9 @@ class PhotoHandler(RequestHandler):
             item, page = item.split("?page=")
             page = int(page)
         return (item, page)
+        
+    def photo_render(self, **kwargs):
+        self.render("photos.html", **kwargs)
         
         
 class GroupHandler(PhotoHandler):
@@ -73,11 +79,8 @@ class GroupHandler(PhotoHandler):
             photos = self.flickr.call("flickr.groups.pools.getPhotos", 
                                         group_id=group_object["id"],
                                         page=page,
-                                        per_page=15)
-            self.render("photos.html", 
-                        photos=photos["photos"]["photo"], 
-                        next_page=page+1,
-                        prev_pag=page-1)
+                                        per_page=self.per_page)
+            self.photo_render(photos=photos["photos"]["photo"], offset=(page - 1) * self.per_page)
         
         
 class UserHandler(PhotoHandler):
@@ -93,12 +96,8 @@ class UserHandler(PhotoHandler):
             photos = self.flickr.call("flickr.people.getPublicPhotos", 
                                         user_id=user_object["id"],
                                         page=page,
-                                        per_page=15)
-            self.render("photos.html", 
-                        photos=photos["photos"]["photo"], 
-                        next_page=page+1,
-                        prev_pag=page-1)
-        
+                                        per_page=self.per_page)
+            self.photo_render(photos=photos["photos"]["photo"], offset=(page - 1) * self.per_page)
         
 def main():
     application = webapp.WSGIApplication([('/', MainHandler),

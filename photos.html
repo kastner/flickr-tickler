@@ -1,21 +1,21 @@
 {% extends "base.html" %}
 {% block content %}
 <div id="bob"></div>
-{% for photo in photos %}
-<div id="photo-{{ forloop.counter }}" class="photo photo-{{ photo.id }}">
-  <a href="http://www.flickr.com/photos/{{ photo.owner }}/{{ photo.id }}" target="_blank">{{ photo.title }}</a><br/>
-  <a href="http://www.flickr.com/photos/{{ photo.owner }}/{{ photo.id }}" title="{{ photo.title }}">
-    <img src="http://farm{{ photo.farm }}.static.flickr.com/{{ photo.server }}/{{ photo.id }}_{{ photo.secret }}.jpg" alt="{{ photo.title }}"/>
-  </a>
+<div id="photos">
+  {% for photo in photos %}
+  <div id="photo-{{ forloop.counter|add:offset }}" class="photo photo-{{ photo.id }}">
+    <a href="http://www.flickr.com/photos/{{ photo.owner }}/{{ photo.id }}" target="_blank">{{ photo.title }}</a><br/>
+    <a href="http://www.flickr.com/photos/{{ photo.owner }}/{{ photo.id }}" title="{{ photo.title }}">
+      <img src="http://farm{{ photo.farm }}.static.flickr.com/{{ photo.server }}/{{ photo.id }}_{{ photo.secret }}.jpg" alt="{{ photo.title }}"/>
+    </a>
+  </div>
+  {% endfor %}  
 </div>
-{% endfor %}
-<a id="prev-link" href="?page={{ prev_page }}">Prev</a>
-<a id="next-link" href="?page={{ next_page }}">Next</a>
-
 
 <script type="text/javascript" charset="utf-8">
   var currentPhotoNum = 1;
   var maxPhotoNum = {{ photos|length }};
+  var pageNumber = 1;
   
   function getPhoto(num) {
     return $("photo-" + num);
@@ -51,10 +51,30 @@
   Event.observe(window, 'keyup', function(event) {
     switch(event.keyCode) {
       case 74: // "J"
-        nextElement().scrollTo(); break;
+        nextElement().scrollTo(); 
+        if (maxPhotoNum - currentPhotoNum < 4) { fetchMorePhotos(); }
+        break;
       case 75: // "K"
         prevElement().scrollTo(); break;
     }
   });
+  
+  Ajax.Responders.register({
+    onCreate: function() { Ajax.activeRequestCount++; },
+    onComplete: function() { Ajax.activeRequestCount--; }
+  });
+  
+  function fetchMorePhotos() {
+    if (Ajax.activeRequestCount > 0) { return; }
+    
+    new Ajax.Updater("photos", window.location + "?page=" + (pageNumber + 1), {
+      insertion: "bottom",
+      method: "get",
+      onComplete: function() {
+        pageNumber += 1;
+        maxPhotoNum += 15;
+      }
+    });
+  }
 </script>
 {% endblock %}
