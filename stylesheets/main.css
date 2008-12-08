@@ -1,15 +1,90 @@
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, font, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  font-size: 100%;
+  vertical-align: baseline;
+  background: transparent;
+}
 body {
-  font: medium Helvetica, Arial, Verdana, sans-serif;
-  background: black;
-  color: white;
+  line-height: 1;
+}
+ol, ul {
+  list-style: none;
+}
+blockquote, q {
+  quotes: none;
 }
 
-a {
-  color: #D4C174;
+/* remember to define focus styles! */
+/*:focus {
+  outline: 0;
+}
+*/
+/* remember to highlight inserts somehow! */
+ins {
+  text-decoration: none;
+}
+del {
+  text-decoration: line-through;
+}
+
+/* tables still need 'cellspacing="0"' in the markup */
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+
+body {
+  font: medium/1.5em Helvetica, Arial, Verdana, sans-serif;
+  background: #311814 url('/images/background.jpg') no-repeat top center;
+  color: #a8a2ae;
+  text-align: center;
+}
+
+p { margin-bottom: 1.5em; }
+a { color: #c87a03; }
+fieldset { margin-bottom: 1.5em; }
+
+#page {
+  width: 700px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+#instructions {
+  text-align: center;
+  font-size: 150%;
+  width: 600px;
+  margin: 0 auto;
+  padding: 1em;
+  border-top: 1px solid #c87a03;
+  border-bottom: 1px solid #c87a03;
+  margin-bottom: 2em;
+}
+
+#instructions span {
+  font-size: 200%;
+  font-weight: bold;
+  font-family: Georgia, Times, serif;
+}
+
+#photos {
+  text-align: center;
 }
 
 .photo {
-  margin-bottom: 15em;
+  margin-bottom: 25em;
 }
 
 .photo img {

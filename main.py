@@ -2,11 +2,10 @@
 
 import wsgiref.handlers
 import re
-
+import urllib
 
 import sys
 sys.path.append("myflickr")
-
 
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
@@ -26,26 +25,23 @@ class MainHandler(RequestHandler):
 class TickleHandler(RequestHandler):
     def get(self):
         group, user, tags = "", "", ""
-        url = self.request.get("url")
-        if not re.search("flickr.com", url):
-            tags = url
-        elif re.search("in/pool-", url):
-            group = re.search("in/pool-(.*)/", url).group(1)
-            # url = "http://flickr.com/groups/%s" % group
-        elif re.search("/groups/", url):
-            group = re.search("/groups/([^/]*)/", url).group(1)
-        elif re.search("/photos/", url):
-            user = re.search("/photos/([^/]*)", url).group(1)
-        
-        
-        if group:
-            self.redirect("/group/%s" % group)
-            # group = f.call("flickr.urls.lookupGroup", url = url)
-            # self.render("tickle.html", group = group)
-        elif user:
+        user = self.request.get("user")
+        group = self.request.get("group")
+        tags = self.request.get("tags")
+        if re.search("flickr.com", user) or re.search("flickr.com", group):
+            url = user + group
+            if re.search("in/pool-", url):
+                group = re.search("in/pool-(.*)/", url).group(1)
+            elif re.search("/groups/", url):
+                group = re.search("/groups/([^/]*)/", url).group(1)
+            elif re.search("/photos/", url):
+                user = re.search("/photos/([^/]*)", url).group(1)
+        if tags:
+            self.redirect("/tag/%s" % urllib.quote(tags))
+        if user:
             self.redirect("/user/%s" % user)
-            # user = f.call("flickr.urls.lookupUser", url = url)
-            # self.render("tickle.html", group=user)
+        elif group:
+            self.redirect("/group/%s" % group)
         
 
 class PhotoHandler(RequestHandler):
@@ -103,11 +99,26 @@ class UserHandler(PhotoHandler):
                                         page=page,
                                         per_page=self.per_page)
             self.photo_render(photos=photos["photos"]["photo"], offset=(page - 1) * self.per_page)
+
+
+class TagsHandler(PhotoHandler):
+    def get(self):
+        tags, page = self.parse()
+        if tags:
+            # memcache here later
+            photos = self.flickr.call("flickr.photos.search", 
+                                        sort="interestingness-desc",
+                                        text=tags,
+                                        page=page,
+                                        per_page=self.per_page)
+            self.photo_render(photos=photos["photos"]["photo"], offset=(page - 1) * self.per_page)
+
         
 def main():
     application = webapp.WSGIApplication([('/', MainHandler),
                                           ('/tickle', TickleHandler),
                                           ('/user/.*', UserHandler),
+                                          ('/tag/.*', TagsHandler),
                                           ('/group/.*', GroupHandler)],
                                        debug=True)
     wsgiref.handlers.CGIHandler().run(application)
