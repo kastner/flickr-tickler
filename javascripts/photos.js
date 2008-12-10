@@ -52,6 +52,13 @@ Ajax.Responders.register({
   onComplete: function() { Ajax.activeRequestCount--; }
 });
 
+document.observe("dom:loaded", function() {
+  $("fetch-more").observe("click", function(event) {
+    event.stop();
+    fetchMorePhotos();
+  });
+});
+
 function fetchMorePhotos() {
   if (Ajax.activeRequestCount > 0) { return; }
   

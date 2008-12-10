@@ -7,10 +7,6 @@
 </p>
 
 <p>
-  Using your keyboard (j to go down, k to go up - even across pages!), you can look at any group / set of flickr pictures you want. Group pools, personal photostreams, even tags!
-</p>
-
-<p>
   You can search for pictures one of three ways:
 </p>
 
@@ -22,8 +18,10 @@
       <input type="text" name="tags" id="tags"/>
       <input type="submit" value="Search Photos"/>
     </div>
-  </fieldset>  
-  
+  </fieldset>
+</form>
+
+<form action="/tickle" method="get">
   <fieldset>
     <legend>By User</legend>
     <div>
@@ -32,7 +30,9 @@
       <input type="submit" value="Load Person's Photos"/>
     </div>
   </fieldset>
-  
+</form>
+
+<form action="/tickle" method="get">
   <fieldset>
     <legend>By Group</legend>
     <div>

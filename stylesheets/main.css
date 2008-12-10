@@ -84,14 +84,27 @@ fieldset { margin-bottom: 1.5em; }
 }
 
 .photo {
-  margin-bottom: 25em;
+  margin-bottom: 8em;
+}
+
+.photo h2 {
+  font-size: 150%;
+  margin: 1em;
 }
 
 .photo img {
-  padding-top: 1em;
+/*  padding-top: 1em;*/
   border: none;
 }
 
-.photo a:focus {
+.photo h2 a:focus {
   outline: 1px solid #525252;
+}
+
+#fetch-more {
+  font-size: 120%;
+  display: block;
+  text-align: center;
+  margin-top: -5em;
+  margin-bottom: 2em;
 }
