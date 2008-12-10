@@ -89,7 +89,11 @@ fieldset { margin-bottom: 1.5em; }
 
 .photo h2 {
   font-size: 150%;
-  margin: 1em;
+  padding-top: 1em;
+}
+
+.photo p {
+  padding-bottom: 0.5em;
 }
 
 .photo img {

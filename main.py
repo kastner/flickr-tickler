@@ -77,7 +77,8 @@ class GroupHandler(PhotoHandler):
             if not api_group:
                 return
             group_object = api_group["group"]
-            photos = self.flickr.call("flickr.groups.pools.getPhotos", 
+            photos = self.flickr.call("flickr.groups.pools.getPhotos",
+                                        extras="owner_name",
                                         group_id=group_object["id"],
                                         page=page,
                                         per_page=self.per_page)
@@ -95,6 +96,7 @@ class UserHandler(PhotoHandler):
                 return
             user_object = api_user["user"]
             photos = self.flickr.call("flickr.people.getPublicPhotos", 
+                                        extras="owner_name",
                                         user_id=user_object["id"],
                                         page=page,
                                         per_page=self.per_page)
@@ -107,10 +109,12 @@ class TagsHandler(PhotoHandler):
         if tags:
             # memcache here later
             photos = self.flickr.call("flickr.photos.search", 
+                                        extras="owner_name",
                                         sort="interestingness-desc",
                                         text=tags,
                                         page=page,
                                         per_page=self.per_page)
+            # self.response.out.write(photos["photos"]["photo"][0])
             self.photo_render(photos=photos["photos"]["photo"], offset=(page - 1) * self.per_page)
 
         

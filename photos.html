@@ -4,6 +4,7 @@
 {% for photo in photos %}
 <div id="photo-{{ forloop.counter|add:offset }}" class="photo photo-{{ photo.id }}">
   <h2><a href="http://www.flickr.com/photos/{{ photo.owner }}/{{ photo.id }}" target="_blank">{{ photo.title }}</a></h2>
+  <p>by {{ photo.ownername }}</p>
   <a href="http://www.flickr.com/photos/{{ photo.owner }}/{{ photo.id }}" title="{{ photo.title }}">
     <img src="http://farm{{ photo.farm }}.static.flickr.com/{{ photo.server }}/{{ photo.id }}_{{ photo.secret }}.jpg" alt="{{ photo.title }}"/>
   </a>
