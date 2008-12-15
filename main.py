@@ -12,6 +12,9 @@ from google.appengine.ext.webapp import template
 from myflickr import MyFlickr
 
 
+template.register_template_library('templatetags.flickrtags')
+
+
 class RequestHandler(webapp.RequestHandler):
     def render(self, template_name, **kwargs):
         self.response.out.write(template.render(template_name, kwargs))
@@ -78,7 +81,7 @@ class GroupHandler(PhotoHandler):
                 return
             group_object = api_group["group"]
             photos = self.flickr.call("flickr.groups.pools.getPhotos",
-                                        extras="owner_name",
+                                        extras="owner_name,o_dims,media",
                                         group_id=group_object["id"],
                                         page=page,
                                         per_page=self.per_page)
@@ -96,10 +99,13 @@ class UserHandler(PhotoHandler):
                 return
             user_object = api_user["user"]
             photos = self.flickr.call("flickr.people.getPublicPhotos", 
-                                        extras="owner_name",
+                                        extras="owner_name,o_dims,media",
                                         user_id=user_object["id"],
                                         page=page,
                                         per_page=self.per_page)
+            for photo in photos["photos"]["photo"]:
+                photo["sizes"] = self.flickr.call("flickr.photos.getSizes",
+                                        photo_id=photo["id"])
             self.photo_render(photos=photos["photos"]["photo"], offset=(page - 1) * self.per_page)
 
 
@@ -109,11 +115,16 @@ class TagsHandler(PhotoHandler):
         if tags:
             # memcache here later
             photos = self.flickr.call("flickr.photos.search", 
-                                        extras="owner_name",
+                                        extras="owner_name,o_dims,media",
                                         sort="interestingness-desc",
                                         text=tags,
                                         page=page,
                                         per_page=self.per_page)
+            for photo in photos["photos"]["photo"]:
+                sizes = self.flickr.call("flickr.photos.getSizes",
+                                        photo_id=photo["id"])
+                for size in sizes["sizes"]["size"]:
+                    photo[size["label"].replace(' ', '_')] = size
             # self.response.out.write(photos["photos"]["photo"][0])
             self.photo_render(photos=photos["photos"]["photo"], offset=(page - 1) * self.per_page)
 

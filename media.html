@@ -1,0 +1,13 @@
+{% if is_photo %}
+  <a href="http://www.flickr.com/photos/{{ photo.owner }}/{{ photo.id }}" title="{{ photo.title }}">
+    <img src="{{ photo.Medium.source }}" height="{{ photo.Medium.height }}" width="{{ photo.Medium.width }}" alt="{{ photo.title }}"/>
+  </a>
+{% else %}
+<object type="application/x-shockwave-flash" width="{{ photo.Video_Player.width }}" height="{{ photo.Video_Player.height }}" data="{{ photo.Video_Player.source }}" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"> 
+  <param name="flashvars" value="intl_lang=en-us&show_info_box=true"></param> 
+  <param name="movie" value="{{ photo.Video_Player.source }}"></param> 
+  <param name="bgcolor" value="#000000"></param> 
+  <param name="allowFullScreen" value="true"></param>
+  <embed type="application/x-shockwave-flash" src="{{ photo.Video_Player.source }}" bgcolor="#000000" allowfullscreen="true" flashvars="intl_lang=en-us&flickr_show_info_box=true" height="{{ photo.Video_Player.height }}" width="{{ photo.Video_Player.width }}"></embed>
+</object>
+{% endif %}
