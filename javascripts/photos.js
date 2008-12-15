@@ -38,7 +38,7 @@ Event.observe(window, 'keyup', function(event) {
     case 74: // "J"
       nextElement().scrollTo();
       currentPhoto().down("a").focus();
-      if (maxPhotoNum - currentPhotoNum < 4) { fetchMorePhotos(); }
+      if (maxPhotoNum - currentPhotoNum < 6) { fetchMorePhotos(); }
       break;
     case 75: // "K"
       prevElement().scrollTo(); 
