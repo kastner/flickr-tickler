@@ -60,7 +60,19 @@ class PhotoHandler(RequestHandler):
             item, page = item.split("?page=")
             page = int(page)
         return (item, page)
-        
+    
+    def fetch(self, method, **kwargs):
+        args = {'per_page': self.per_page, 'extras': "owner_name,o_dims,media"}
+        args.update(kwargs)
+        photos = self.flickr.call(method, **args)
+        for photo in photos["photos"]["photo"]:
+            sizes = self.flickr.call("flickr.photos.getSizes",
+                                    photo_id=photo["id"])
+            for size in sizes["sizes"]["size"]:
+                photo[size["label"].replace(' ', '_')] = size
+        return photos["photos"]["photo"]
+    
+    
     def photo_render(self, **kwargs):
         photos_block = template.render("photos.html", kwargs)
         if (str(self.request.accept).startswith("text/javascript")):
@@ -80,12 +92,9 @@ class GroupHandler(PhotoHandler):
             if not api_group:
                 return
             group_object = api_group["group"]
-            photos = self.flickr.call("flickr.groups.pools.getPhotos",
-                                        extras="owner_name,o_dims,media",
-                                        group_id=group_object["id"],
-                                        page=page,
-                                        per_page=self.per_page)
-            self.photo_render(photos=photos["photos"]["photo"], offset=(page - 1) * self.per_page)
+            photos = self.fetch("flickr.groups.pools.getPhotos",
+                                group_id=group_object["id"], page=page)
+            self.photo_render(photos=photos, offset=(page - 1) * self.per_page)
         
         
 class UserHandler(PhotoHandler):
@@ -98,35 +107,19 @@ class UserHandler(PhotoHandler):
             if not api_user:
                 return
             user_object = api_user["user"]
-            photos = self.flickr.call("flickr.people.getPublicPhotos", 
-                                        extras="owner_name,o_dims,media",
-                                        user_id=user_object["id"],
-                                        page=page,
-                                        per_page=self.per_page)
-            for photo in photos["photos"]["photo"]:
-                photo["sizes"] = self.flickr.call("flickr.photos.getSizes",
-                                        photo_id=photo["id"])
-            self.photo_render(photos=photos["photos"]["photo"], offset=(page - 1) * self.per_page)
+            photos = self.fetch("flickr.people.getPublicPhotos", 
+                                user_id=user_object["id"], page=page)
+            self.photo_render(photos=photos, offset=(page - 1) * self.per_page)
 
 
 class TagsHandler(PhotoHandler):
     def get(self):
         tags, page = self.parse()
         if tags:
-            # memcache here later
-            photos = self.flickr.call("flickr.photos.search", 
-                                        extras="owner_name,o_dims,media",
-                                        sort="interestingness-desc",
-                                        text=tags,
-                                        page=page,
-                                        per_page=self.per_page)
-            for photo in photos["photos"]["photo"]:
-                sizes = self.flickr.call("flickr.photos.getSizes",
-                                        photo_id=photo["id"])
-                for size in sizes["sizes"]["size"]:
-                    photo[size["label"].replace(' ', '_')] = size
+            photos = self.fetch("flickr.photos.search", 
+                                sort="interestingness-desc", text=tags, page=page)
             # self.response.out.write(photos["photos"]["photo"][0])
-            self.photo_render(photos=photos["photos"]["photo"], offset=(page - 1) * self.per_page)
+            self.photo_render(photos=photos, offset=(page - 1) * self.per_page)
 
         
 def main():
