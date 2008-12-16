@@ -1,7 +1,9 @@
 * Message on empty pages (like smarbin)
 * Exception catching
-* Video support
 * Favicon
 * Add titles to the pages
 * Show CC licensed images
 * Fix lots of bugs
+
+DONE:
+* Video support
