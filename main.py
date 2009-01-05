@@ -7,12 +7,18 @@ import urllib
 import sys
 sys.path.append("myflickr")
 
-from google.appengine.ext import webapp
+from google.appengine.api import users
+from google.appengine.ext import webapp, db
 from google.appengine.ext.webapp import template
 from myflickr import MyFlickr
 
 
 template.register_template_library('templatetags.flickrtags')
+
+
+class User(db.Model):
+    user = db.UserProperty()
+    token = db.StringProperty()
 
 
 class RequestHandler(webapp.RequestHandler):
@@ -51,7 +57,7 @@ class PhotoHandler(RequestHandler):
     per_page = 15
     
     def __init__(self):
-        self.flickr = MyFlickr("bf1a023e68d6ce32412b9988a3c5cdcb")
+        self.flickr = MyFlickr("bf1a023e68d6ce32412b9988a3c5cdcb", "a9953877adb04b9f")
         
     def parse(self):
         page = 1
@@ -62,9 +68,16 @@ class PhotoHandler(RequestHandler):
         return (item, page)
     
     def fetch(self, method, **kwargs):
+        the_user = users.get_current_user()
+        if the_user:
+            user = User.get_by_key_name("foo_" + the_user.email())
         args = {'per_page': self.per_page, 'extras': "owner_name,o_dims,media"}
         args.update(kwargs)
-        photos = self.flickr.call(method, **args)
+        if the_user:
+            args.update({"auth_token": user.token})
+            photos = self.flickr.signed_call(method, **args)
+        else:
+            photos = self.flickr.call(method, **args)
         for photo in photos["photos"]["photo"]:
             sizes = self.flickr.call("flickr.photos.getSizes",
                                     photo_id=photo["id"])
@@ -80,8 +93,21 @@ class PhotoHandler(RequestHandler):
         else:
             kwargs.update({"photos_block": photos_block})
             self.render("photo_page.html", **kwargs)
-        
-        
+
+
+class FrobHandler(PhotoHandler):
+    def get(self):
+        frob = self.request.get("frob")
+        token = self.flickr.get_token(frob)
+        if token and users.get_current_user():
+            the_user = users.get_current_user()
+            user = User(key_name = "foo_" + the_user.email())
+            user.user = the_user
+            user.token = token
+            user.put()
+            self.redirect('/')
+
+
 class GroupHandler(PhotoHandler):
     def get(self):
         group, page = self.parse()
@@ -121,13 +147,24 @@ class TagsHandler(PhotoHandler):
             # self.response.out.write(photos["photos"]["photo"][0])
             self.photo_render(photos=photos, offset=(page - 1) * self.per_page)
 
-        
+
+class AuthHandler(PhotoHandler):
+    def get(self):
+        user = users.get_current_user()
+        if user:
+            self.response.out.write("Link: <a href='%s'>Authorize</a>" % self.flickr.login_link())
+        else:
+            self.redirect(users.create_login_url(self.request.uri))
+
+
 def main():
     application = webapp.WSGIApplication([('/', MainHandler),
                                           ('/tickle', TickleHandler),
                                           ('/user/.*', UserHandler),
                                           ('/tag/.*', TagsHandler),
-                                          ('/group/.*', GroupHandler)],
+                                          ('/group/.*', GroupHandler),
+                                          ('/frob', FrobHandler),
+                                          ('/authorize', AuthHandler)],
                                        debug=True)
     wsgiref.handlers.CGIHandler().run(application)
 
